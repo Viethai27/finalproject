@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -10,10 +10,13 @@ import {
   VStack,
   useToast,
   IconButton,
+  Checkbox,
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
+
+const specialCategories = ["Featured", "Popular this month", "Newest"];
 
 const AddProductForm = () => {
   const [formData, setFormData] = useState({
@@ -22,11 +25,32 @@ const AddProductForm = () => {
     price: '',
     technology: '',
     imageUrls: [''],
+    isFeatured: false,
   });
 
   const toast = useToast();
   const [searchParams] = useSearchParams();
-  const categoryIdFromUrl = searchParams.get('category'); // Lấy categoryId từ URL
+  const categoryIdFromUrl = searchParams.get('category');
+  const [categoryName, setCategoryName] = useState('');
+
+  useEffect(() => {
+    const fetchCategoryName = async () => {
+      if (!categoryIdFromUrl) return;
+      try {
+        const res = await axios.get(`http://localhost:5000/api/categories/${categoryIdFromUrl}`);
+        setCategoryName(res.data.name);
+      } catch (err) {
+        console.error(err);
+        toast({
+          title: 'Failed to fetch category info',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    };
+    fetchCategoryName();
+  }, [categoryIdFromUrl, toast]);
 
   const handleImageChange = (index, value) => {
     const newImages = [...formData.imageUrls];
@@ -67,11 +91,21 @@ const AddProductForm = () => {
       return;
     }
 
+    if (specialCategories.includes(categoryName)) {
+      toast({
+        title: 'Cannot add product to a special category.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     try {
       const payload = {
         ...formData,
         price: parseFloat(formData.price),
-        categoryIds: [categoryIdFromUrl], // Gửi categoryId dưới dạng mảng
+        categoryIds: [categoryIdFromUrl],
         imageUrls: formData.imageUrls.filter((url) => url.trim() !== ''),
       };
 
@@ -82,14 +116,14 @@ const AddProductForm = () => {
         duration: 3000,
         isClosable: true,
       });
- 
-      // Reset form
+
       setFormData({
         name: '',
         description: '',
         price: '',
         technology: '',
         imageUrls: [''],
+        isFeatured: false,
       });
     } catch (err) {
       console.error(err);
@@ -172,6 +206,15 @@ const AddProductForm = () => {
                 Add Image
               </Button>
             </VStack>
+          </FormControl>
+
+          <FormControl>
+            <Checkbox
+              isChecked={formData.isFeatured}
+              onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+            >
+              Mark as Featured Product
+            </Checkbox>
           </FormControl>
 
           <Button colorScheme="teal" type="submit">

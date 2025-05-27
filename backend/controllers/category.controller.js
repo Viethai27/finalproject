@@ -1,13 +1,52 @@
 import BaseController from "./BaseController.controller.js";
 import Category from "../models/Category.model.js";
+import FeaturedSection from "../models/FeaturedSection.model.js";
 
-export const {
+const {
   getAll: getCategories,
-  create: createCategory,
   update: updateCategory
 } = BaseController(Category);
 
-export const getCategoriesByParent = async (req, res) => {
+const specialSections = ["Featured", "Popular this month", "Newest"];
+
+const createCategory = async (req, res) => {
+  try {
+    const { parent } = req.body;
+
+    if (parent) {
+      const parentCategory = await Category.findById(parent);
+      if (specialSections.includes(parentCategory?.name)) {
+        return res.status(400).json({ success: false, message: "Cannot set special categories as parent." });
+      }
+    }
+
+    const category = new Category(req.body);
+    const savedCategory = await category.save();
+
+    if (!category.parent) {
+      for (const name of specialSections) {
+        const childCategory = await Category.create({
+          name,
+          parent: savedCategory._id,
+          isSpecial: true,
+          displayName: name.toUpperCase()
+        });
+
+        if (name === "Featured") {
+          await FeaturedSection.create({
+            categoryId: savedCategory._id
+          });
+        }
+      }
+    }
+
+    res.status(201).json({ success: true, data: savedCategory });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getCategoriesByParent = async (req, res) => {
   try {
     const { parent } = req.query;
     const query = parent ? { parent } : {};
@@ -18,7 +57,7 @@ export const getCategoriesByParent = async (req, res) => {
   }
 };
 
-export const getCategoryTreeByParent = async (req, res) => {
+const getCategoryTreeByParent = async (req, res) => {
   try {
     const { parent } = req.query;
     if (!parent) {
@@ -43,15 +82,17 @@ export const getCategoryTreeByParent = async (req, res) => {
   }
 };
 
-export const getRootCategories = async (req, res) => {
+const getRootCategories = async (req, res) => {
   try {
     const categories = await Category.find({ parent: null });
-    res.status(200).json({ success: true, data: categories });
+    const filtered = categories.filter(cat => !specialSections.includes(cat.name));
+    res.status(200).json({ success: true, data: filtered });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-export const deleteCategory = async (req, res) => {
+
+const deleteCategory = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -74,3 +115,12 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
+export {
+  getCategories,
+  updateCategory,
+  createCategory,
+  getCategoriesByParent,
+  getCategoryTreeByParent,
+  getRootCategories,
+  deleteCategory
+};

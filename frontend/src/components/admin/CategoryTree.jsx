@@ -5,35 +5,53 @@ import { useNavigate } from "react-router-dom";
 const CategoryTree = ({ categories, onDelete }) => {
   const navigate = useNavigate();
 
-  const renderItem = (cat, level = 0) => (
-    <Box key={cat._id} pl={level * 6} py={1} w="full" _hover={{ bg: "gray.50" }}>
-      <HStack justify="space-between" w="full" _hover={{ bg: "gray.100", cursor: "pointer" }}>
-        <Text fontWeight={level === 0 ? "bold" : "normal"}>{cat.name}</Text>
-        <HStack>
-          {(!cat.children || cat.children.length === 0) && (
-            <Button
-              size="xs"
-              colorScheme="teal"
-              onClick={() =>
-                navigate(`/admin/products/AddProductForm?category=${cat._id}`)
-              }
-            >
-              Add Product
-            </Button>
-          )}
-          <IconButton
-            icon={<DeleteIcon />}
-            size="sm"
-            variant="ghost"
-            colorScheme="red"
-            aria-label="Delete category"
-            onClick={() => onDelete(cat)}
-          />
+  const specialCategoryNames = ['FEATURED', 'POPULAR THIS MONTH', 'NEWEST'];
+
+  const renderItem = (cat, level = 0) => {
+    const hasChildren = Array.isArray(cat.children) && cat.children.length > 0;
+
+    // Kiểm tra xem category này có phải category đặc biệt không
+    const isSpecial = specialCategoryNames.includes(cat.name.toUpperCase());
+
+    return (
+      <Box key={cat._id} pl={level * 6} py={1} w="full">
+        <HStack justify="space-between" w="full">
+          <Text
+            fontWeight={level === 0 ? "bold" : "normal"}
+            textTransform={level <= 1 ? "uppercase" : "none"} // Mức 0 và 1 in hoa
+          >
+            {cat.name}
+          </Text>
+
+          <HStack spacing={2}>
+            {/* Ẩn nút Add Product nếu là category đặc biệt hoặc có con */}
+            {!hasChildren && !isSpecial && (
+              <Button
+                size="xs"
+                colorScheme="teal"
+                onClick={() =>
+                  navigate(`/admin/products/AddProductForm?category=${cat._id}`)
+                }
+              >
+                Add Product
+              </Button>
+            )}
+            <IconButton
+              icon={<DeleteIcon />}
+              size="sm"
+              variant="ghost"
+              colorScheme="red"
+              aria-label="Delete category"
+              onClick={() => onDelete(cat)}
+            />
+          </HStack>
         </HStack>
-      </HStack>
-      {cat.children?.map((child) => renderItem(child, level + 1))}
-    </Box>
-  );
+
+        {hasChildren &&
+          cat.children.map((child) => renderItem(child, level + 1))}
+      </Box>
+    );
+  };
 
   return <>{categories.map((cat) => renderItem(cat))}</>;
 };
