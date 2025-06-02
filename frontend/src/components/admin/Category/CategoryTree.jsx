@@ -10,7 +10,6 @@ const CategoryTree = ({ categories, onDelete }) => {
   const renderItem = (cat, level = 0) => {
     const hasChildren = Array.isArray(cat.children) && cat.children.length > 0;
 
-    // Kiểm tra xem category này có phải category đặc biệt không
     const isSpecial = specialCategoryNames.includes(cat.name.toUpperCase());
 
     return (
@@ -18,13 +17,12 @@ const CategoryTree = ({ categories, onDelete }) => {
         <HStack justify="space-between" w="full">
           <Text
             fontWeight={level === 0 ? "bold" : "normal"}
-            textTransform={level <= 1 ? "uppercase" : "none"} // Mức 0 và 1 in hoa
+            textTransform={level <= 1 ? "uppercase" : "none"}
           >
             {cat.name}
           </Text>
 
           <HStack spacing={2}>
-            {/* Ẩn nút Add Product nếu là category đặc biệt hoặc có con */}
             {!hasChildren && !isSpecial && (
               <Button
                 size="xs"

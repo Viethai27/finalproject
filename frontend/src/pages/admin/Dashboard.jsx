@@ -3,7 +3,6 @@ import ProductList from '../../components/shared/ProductList'
 const Dashboard = () => {
   return (
     <div>
-       <AdminNavbar />
     </div>
     
   )
