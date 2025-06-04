@@ -1,5 +1,6 @@
-import { Box, VStack, Text, Link as ChakraLink } from "@chakra-ui/react";
+import { Box, VStack, Text, Button } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
+import { GiFallingLeaf } from "react-icons/gi";
 
 const AdminSidebar = () => {
   const location = useLocation();
@@ -12,23 +13,47 @@ const AdminSidebar = () => {
   ];
 
   return (
-    <Box w="64" bg="gray.100" minH="100vh" p={4}>
-      <Text fontSize="lg" fontWeight="bold" mb={4}>
-        Admin Panel
+    <Box
+      w="64"
+      bg="white"
+      minH="100vh"
+      p={4}
+      mt="50"
+    >
+      <Text
+        fontSize="lg"
+        fontWeight="extrabold"
+        mb={4}
+        bgColor="rgb(60, 50, 170)"
+        bgClip="text"
+      >
+        Admin Panel 
       </Text>
-      <VStack align="start" spacing={3}>
-        {links.map((link) => (
-          <ChakraLink
-            as={Link}
-            to={link.path}
-            fontWeight={location.pathname === link.path ? "bold" : "normal"}
-            color={location.pathname === link.path ? "teal.500" : "gray.700"}
-            _hover={{ textDecoration: "underline" }}
-            key={link.path}
-          >
-            {link.label}
-          </ChakraLink>
-        ))}
+
+      <VStack align="stretch" spacing={2}>
+        {links.map((link) => {
+          const isActive = location.pathname === link.path;
+
+          return (
+            <Button
+              as={Link}
+              to={link.path}
+              key={link.path}
+              justifyContent="flex-start"
+              variant="ghost"
+              size="md"
+              fontWeight={isActive ? "bold" : "normal"}
+              color={isActive ? "rgb(51, 20, 176)" : "rgb(35, 72, 196)"}
+              _hover={{ bg: "gray.100" }}
+              bg="transparent"
+              _active={{ bg: "transparent" }} 
+              _focus={{ boxShadow: "none" }}
+              borderRadius="md"
+            >
+              {link.label}
+            </Button>
+          );
+        })}
       </VStack>
     </Box>
   );

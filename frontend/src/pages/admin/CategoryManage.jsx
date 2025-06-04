@@ -1,6 +1,5 @@
 
-import { useState, useEffect } from "react";
-import Navbar from "../../components/admin/AdminNavbar";
+import { useState, useEffect } from "react"
 import {
   Box,
   Button,
@@ -129,15 +128,12 @@ const CategoryManage = () => {
   return (
     <>
       <Box mt={4} mr={6} display="flex" justifyContent="flex-end">
-        <Button onClick={openForm} colorScheme="blue">
+        <Button onClick={openForm} bg="rgb(58, 44, 217)" color="white" _hover={{ bg: "rgb(138, 129, 234)" }}>
           Add New Category
         </Button>
       </Box>
 
-      <Box mt={6} px={6}>
-        <Text fontSize="xl" fontWeight="bold" mb={3}>
-          Category Tree
-        </Text>
+      <Box mt={6} px={6} color="rgb(60, 50, 170)" fontWeight="bold">
         <VStack align="start" spacing={1} w="full">
           <CategoryTree
             categories={categoryTree}

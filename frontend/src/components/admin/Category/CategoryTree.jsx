@@ -23,17 +23,6 @@ const CategoryTree = ({ categories, onDelete }) => {
           </Text>
 
           <HStack spacing={2}>
-            {!hasChildren && !isSpecial && (
-              <Button
-                size="xs"
-                colorScheme="teal"
-                onClick={() =>
-                  navigate(`/admin/products/AddProductForm?category=${cat._id}`)
-                }
-              >
-                Add Product
-              </Button>
-            )}
             <IconButton
               icon={<DeleteIcon />}
               size="sm"
