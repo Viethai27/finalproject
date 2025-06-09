@@ -1,0 +1,6 @@
+# Bỏ theo dõi node_modules và các file không cần thiết
+node_modules/
+dist/
+.env
+*.log
+.vscode/
