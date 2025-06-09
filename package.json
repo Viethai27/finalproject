@@ -19,6 +19,8 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "mongoose": "^8.14.1",
+    "react-datepicker": "^8.4.0",
+    "react-select": "^5.10.1",
     "vite": "^6.3.3"
   },
   "devDependencies": {

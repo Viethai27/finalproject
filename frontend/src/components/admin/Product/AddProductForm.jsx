@@ -14,11 +14,14 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import axios from 'axios';
-import { useSearchParams } from 'react-router-dom';
-
-const specialCategories = ["Featured", "Popular this month", "Newest"];
+import DatePicker from 'react-datepicker';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const AddProductForm = () => {
+  const toast = useToast();
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -26,31 +29,55 @@ const AddProductForm = () => {
     technology: '',
     imageUrls: [''],
     isFeatured: false,
+    featuredStart: null,
+    featuredEnd: null,
+    categoryIds: [],
   });
 
-  const toast = useToast();
-  const [searchParams] = useSearchParams();
-  const categoryIdFromUrl = searchParams.get('category');
-  const [categoryName, setCategoryName] = useState('');
+  const [leafCategories, setLeafCategories] = useState([]);
 
   useEffect(() => {
-    const fetchCategoryName = async () => {
-      if (!categoryIdFromUrl) return;
+    const fetchCategories = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/categories/${categoryIdFromUrl}`);
-        setCategoryName(res.data.name);
+        const res = await axios.get('http://localhost:5000/api/categories/tree');
+        const raw = res.data.data;
+
+        const isSpecial = (name) =>
+          ['Featured', 'Popular this month', 'Newest'].includes(name);
+
+        const leafs = [];
+
+        const traverse = (nodes, parentPath = []) => {
+          nodes.forEach((node) => {
+            if (isSpecial(node.name)) return;
+
+            const currentPath = [...parentPath, node.name];
+
+            if (!node.children || node.children.length === 0) {
+              leafs.push({
+                value: node._id,
+                label: currentPath.join(' > '),
+              });
+            } else {
+              traverse(node.children, currentPath);
+            }
+          });
+        };
+
+        traverse(raw);
+        setLeafCategories(leafs);
       } catch (err) {
-        console.error(err);
         toast({
-          title: 'Failed to fetch category info',
+          title: 'Failed to load categories',
           status: 'error',
           duration: 3000,
           isClosable: true,
         });
       }
     };
-    fetchCategoryName();
-  }, [categoryIdFromUrl, toast]);
+
+    fetchCategories();
+  }, [toast]);
 
   const handleImageChange = (index, value) => {
     const newImages = [...formData.imageUrls];
@@ -81,9 +108,9 @@ const AddProductForm = () => {
       return;
     }
 
-    if (!categoryIdFromUrl) {
+    if (formData.categoryIds.length === 0) {
       toast({
-        title: 'Category ID is missing in the URL.',
+        title: 'Please select at least one category.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -91,9 +118,9 @@ const AddProductForm = () => {
       return;
     }
 
-    if (specialCategories.includes(categoryName)) {
+    if (formData.isFeatured && (!formData.featuredStart || !formData.featuredEnd)) {
       toast({
-        title: 'Cannot add product to a special category.',
+        title: 'Please provide start and end dates for featured products.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -105,11 +132,11 @@ const AddProductForm = () => {
       const payload = {
         ...formData,
         price: parseFloat(formData.price),
-        categoryIds: [categoryIdFromUrl],
         imageUrls: formData.imageUrls.filter((url) => url.trim() !== ''),
       };
 
       await axios.post('http://localhost:5000/api/products/full', payload);
+
       toast({
         title: 'Product created successfully',
         status: 'success',
@@ -124,6 +151,9 @@ const AddProductForm = () => {
         technology: '',
         imageUrls: [''],
         isFeatured: false,
+        featuredStart: null,
+        featuredEnd: null,
+        categoryIds: [],
       });
     } catch (err) {
       console.error(err);
@@ -138,7 +168,7 @@ const AddProductForm = () => {
   };
 
   return (
-    <Box maxW="600px" mx="auto" mt={8} p={6} borderWidth="1px" borderRadius="xl" boxShadow="lg">
+    <Box maxW="700px" mx="auto" mt={8} p={6} borderWidth="1px" borderRadius="xl" boxShadow="lg">
       <Heading as="h2" size="lg" mb={4}>
         Add New Product
       </Heading>
@@ -165,8 +195,8 @@ const AddProductForm = () => {
           <FormControl isRequired>
             <FormLabel>Price</FormLabel>
             <Input
-              placeholder="Price"
               type="number"
+              placeholder="Price"
               value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
             />
@@ -178,6 +208,25 @@ const AddProductForm = () => {
               placeholder="Technology"
               value={formData.technology}
               onChange={(e) => setFormData({ ...formData, technology: e.target.value })}
+            />
+          </FormControl>
+
+          <FormControl isRequired>
+            <FormLabel>Select Categories (leaf only)</FormLabel>
+            <Select
+              components={makeAnimated()}
+              isMulti
+              placeholder="Choose categories..."
+              options={leafCategories}
+              value={leafCategories.filter((cat) =>
+                formData.categoryIds.includes(cat.value)
+              )}
+              onChange={(selectedOptions) =>
+                setFormData({
+                  ...formData,
+                  categoryIds: selectedOptions.map((opt) => opt.value),
+                })
+              }
             />
           </FormControl>
 
@@ -211,11 +260,41 @@ const AddProductForm = () => {
           <FormControl>
             <Checkbox
               isChecked={formData.isFeatured}
-              onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+              onChange={(e) =>
+                setFormData({ ...formData, isFeatured: e.target.checked })
+              }
             >
               Mark as Featured Product
             </Checkbox>
           </FormControl>
+
+          {formData.isFeatured && (
+            <>
+              <FormControl isRequired>
+                <FormLabel>Featured Start Date</FormLabel>
+                <DatePicker
+                  selected={formData.featuredStart}
+                  onChange={(date) =>
+                    setFormData({ ...formData, featuredStart: date })
+                  }
+                  dateFormat="yyyy-MM-dd"
+                  className="chakra-input css-1c6x7wr"
+                />
+              </FormControl>
+
+              <FormControl isRequired>
+                <FormLabel>Featured End Date</FormLabel>
+                <DatePicker
+                  selected={formData.featuredEnd}
+                  onChange={(date) =>
+                    setFormData({ ...formData, featuredEnd: date })
+                  }
+                  dateFormat="yyyy-MM-dd"
+                  className="chakra-input css-1c6x7wr"
+                />
+              </FormControl>
+            </>
+          )}
 
           <Button colorScheme="teal" type="submit">
             Create Product

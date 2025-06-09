@@ -9,9 +9,14 @@ const {
 
 const specialSections = ["Featured", "Popular this month", "Newest"];
 
+const toSlug = (str) =>
+  str.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
 const createCategory = async (req, res) => {
   try {
-    const { parent } = req.body;
+    const { parent, name } = req.body;
 
     if (parent) {
       const parentCategory = await Category.findById(parent);
@@ -19,6 +24,9 @@ const createCategory = async (req, res) => {
         return res.status(400).json({ success: false, message: "Cannot set special categories as parent." });
       }
     }
+
+    const slug = toSlug(name);
+    req.body.slug = slug;
 
     const category = new Category(req.body);
     const savedCategory = await category.save();
@@ -29,7 +37,8 @@ const createCategory = async (req, res) => {
           name,
           parent: savedCategory._id,
           isSpecial: true,
-          displayName: name.toUpperCase()
+          displayName: name.toUpperCase(),
+          slug: toSlug(name)
         });
 
         if (name === "Featured") {
@@ -41,6 +50,17 @@ const createCategory = async (req, res) => {
     }
 
     res.status(201).json({ success: true, data: savedCategory });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getCategoryBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const category = await Category.findOne({ slug });
+    if (!category) return res.status(404).json({ success: false, message: "Category not found" });
+    res.status(200).json({ success: true, data: category });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -115,12 +135,45 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+const getFullCategoryTree = async (req, res) => {
+  try {
+    const roots = await Category.find({ parent: null });
+
+    const tree = await Promise.all(
+      roots.map(async (root) => {
+        const level2 = await Category.find({ parent: root._id });
+
+        const level2WithChildren = await Promise.all(
+          level2.map(async (lvl2) => {
+            const level3 = await Category.find({ parent: lvl2._id });
+            return {
+              ...lvl2.toObject(),
+              children: level3
+            };
+          })
+        );
+
+        return {
+          ...root.toObject(),
+          children: level2WithChildren
+        };
+      })
+    );
+
+    res.status(200).json({ success: true, data: tree });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export {
+  getFullCategoryTree,
   getCategories,
   updateCategory,
   createCategory,
   getCategoriesByParent,
   getCategoryTreeByParent,
   getRootCategories,
-  deleteCategory
+  deleteCategory,
+  getCategoryBySlug
 };

@@ -43,7 +43,7 @@ const Navbar = () => {
           bgClip="text"
           fontSize="5xl"
           fontWeight="extrabold"
-          mb="-3"
+          mb="-4"
           mt="-4"
         >
           <Link to="/" style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -54,7 +54,7 @@ const Navbar = () => {
         {/* Search box */}
         {showSearch && (
           <Flex flex="1" justify="flex-end">
-            <InputGroup width="200px" mt="1" mb="1">
+            <InputGroup width="200px" mt="2" mb="1">
               <Input
                 placeholder="Search..."
                 size="sm"
@@ -70,7 +70,7 @@ const Navbar = () => {
         )}
 
         {/* Action buttons */}
-        <HStack spacing={2}>
+        <HStack spacing={2} mb="1" mt="1">
           <IconButton
             aria-label="User Profile"
             variant="unstyled"

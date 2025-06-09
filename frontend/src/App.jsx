@@ -7,6 +7,8 @@ import AddProduct from "./pages/admin/AddProduct" ;
 import ProductListByCategory from "./pages/customer/ProductListByCategory";
 import CategoryManage from "./pages/admin/CategoryManage";
 import AdminLayout from "./layouts/AdminLayout";
+import CustomerLayout from "./layouts/CustomerLayout";
+import ProductDetail from "./pages/customer/ProductDetail";
 
 function App() {
     return (
@@ -20,8 +22,11 @@ function App() {
                     <Route path="products" element={<AddProduct />} />
                 </Route>
 
-                <Route path="/customer" element={<Home />} /> 
-                <Route path="/products/category/:categoryId" element={<ProductListByCategory />} />
+               <Route path="/customer" element={<CustomerLayout />}>
+                    <Route path="home" element={<Home/>} />
+                    <Route path="product-detail" element={<ProductDetail/>} />
+                    <Route path="products/category/:slug" element={<ProductListByCategory />} />
+               </Route>
             </Routes>
 
         </Box>

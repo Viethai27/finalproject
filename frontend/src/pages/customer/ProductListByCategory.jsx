@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProductList from '../../components/shared/ProductList';
-import CustomerNavbar from '../../components/customer/CustomerNavbar';
+import CustomerNavbar from '../../components/customer/CustomerNavbar/CustomerNavbar';
 
 const ProductListByCategory = () => {
   const { categoryId } = useParams();
@@ -41,7 +41,6 @@ const ProductListByCategory = () => {
 
   return (
     <>
-      <CustomerNavbar />
       <ProductList products={products} />
     </>
   );

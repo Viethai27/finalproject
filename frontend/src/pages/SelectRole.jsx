@@ -34,7 +34,7 @@ const SelectRole = () => {
           <Button
             colorScheme="blue"
             size="lg"
-            onClick={() => navigate("/customer")}
+            onClick={() => navigate("/customer/home")}
             _hover={{ bg: "blue.600" }}
           >
             Customer
