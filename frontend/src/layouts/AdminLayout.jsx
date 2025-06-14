@@ -4,7 +4,7 @@ import AdminNavbar from "../components/admin/AdminNavbar";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminFooter from "../components/admin/AdminFooter";
 
-const NAVBAR_HEIGHT = "50px";
+const NAVBAR_HEIGHT = "58px";
 const FOOTER_HEIGHT = "60px";
 
 const AdminLayout = () => {
@@ -19,8 +19,7 @@ const AdminLayout = () => {
         height={NAVBAR_HEIGHT}
         zIndex="900"
         bg="white"
-        borderBottom="1px solid"
-        borderColor="gray.300"
+
       >
         <AdminNavbar />
       </Box>
@@ -44,6 +43,7 @@ const AdminLayout = () => {
           p={6}
           overflowY="auto"
           bg="white"
+          zIndex="0"
           minHeight={`calc(100vh - ${NAVBAR_HEIGHT} - ${FOOTER_HEIGHT})`}
         >
           <Outlet />

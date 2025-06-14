@@ -4,7 +4,8 @@ const collectionSchema = new mongoose.Schema({
   name: { 
     type: String, 
     required: true },
-  description: String
+  description: String,
+  images: [String]
 });
 
 const Collection = mongoose.model('Collection', collectionSchema);

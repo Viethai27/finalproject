@@ -29,13 +29,17 @@ const Navbar = () => {
       position="fixed"
       top="0"
       left="0"
+      zIndex="1000"
+      borderBottom="1px solid"
+      borderColor="gray.300"
     >
       <Flex
         direction="row"
         align="center"
         justify="space-between"
-        wrap="wrap"
+        wrap="nowrap"
         gap={4}
+        minH="50px"
       >
         {/* Logo */}
         <Text
@@ -47,27 +51,25 @@ const Navbar = () => {
           mt="-4"
         >
           <Link to="/" style={{ display: 'inline-flex', alignItems: 'center' }}>
-            Cielo <Box as={GiFallingLeaf} display="inline" mb ={-0.5} ml={-1} color="rgb(38, 6, 169)" />
+            Cielo <Box as={GiFallingLeaf} display="inline" mb={-0.5} ml={-1} color="rgb(38, 6, 169)" />
           </Link>
         </Text>
 
-        {/* Search box */}
-        {showSearch && (
-          <Flex flex="1" justify="flex-end">
-            <InputGroup width="200px" mt="2" mb="1">
-              <Input
-                placeholder="Search..."
-                size="sm"
-                bg="gray.100"
-                color="black"
-                borderRadius="full"
-              />
-              <InputRightElement mt="-0.5" pointerEvents="none">
-                <FaSearch color="rgb(60, 50, 170)" />
-              </InputRightElement>
-            </InputGroup>
-          </Flex>
-        )}
+        {/* Search box or placeholder to preserve height */}
+        <Flex flex="1" justify="flex-end">
+          <InputGroup width="200px" mt="2" mb="1" visibility={showSearch ? "visible" : "hidden"}>
+            <Input
+              placeholder="Search..."
+              size="sm"
+              bg="gray.100"
+              color="black"
+              borderRadius="full"
+            />
+            <InputRightElement mt="-0.5" pointerEvents="none">
+              <FaSearch color="rgb(60, 50, 170)" />
+            </InputRightElement>
+          </InputGroup>
+        </Flex>
 
         {/* Action buttons */}
         <HStack spacing={2} mb="1" mt="1">

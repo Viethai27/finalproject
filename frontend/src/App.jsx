@@ -9,6 +9,8 @@ import CategoryManage from "./pages/admin/CategoryManage";
 import AdminLayout from "./layouts/AdminLayout";
 import CustomerLayout from "./layouts/CustomerLayout";
 import ProductDetail from "./pages/customer/ProductDetail";
+import CollectionManagementt from "./pages/admin/Collection";
+import ProductManagementPage from "./pages/admin/ProductManagement";
 
 function App() {
     return (
@@ -19,7 +21,9 @@ function App() {
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<Dashboard />} />
                     <Route path="categories" element={<CategoryManage />} />
-                    <Route path="products" element={<AddProduct />} />
+                    <Route path="addproducts" element={<AddProduct />} />
+                    <Route path="collections" element={<CollectionManagementt />} />
+                    <Route path="productmanagement" element={<ProductManagementPage />} />
                 </Route>
 
                <Route path="/customer" element={<CustomerLayout />}>

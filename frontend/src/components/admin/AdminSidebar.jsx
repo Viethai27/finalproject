@@ -8,7 +8,7 @@ const AdminSidebar = () => {
   const links = [
     { label: "Dashboard", path: "/admin" },
     { label: "Category Management", path: "/admin/categories" },
-    { label: "Product Management", path: "/admin/products" },
+    { label: "Product Management", path: "/admin/productmanagement" },
     { label: "Collection Management", path: "/admin/collections" },
   ];
 

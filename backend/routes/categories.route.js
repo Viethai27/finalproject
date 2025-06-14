@@ -17,7 +17,7 @@ router.get("/by-parent", getCategoriesByParent);
 router.get("/tree-by-parent", getCategoryTreeByParent);
 router.get("/roots", getRootCategories);
 router.get("/tree", getFullCategoryTree);
-router.get("/slug/:slug", getCategoryBySlug); // 👈 Route mới dùng slug
+router.get("/slug/:slug", getCategoryBySlug);
 
 router.get("/", getCategories);
 router.post("/", createCategory);
