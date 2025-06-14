@@ -55,22 +55,6 @@ const Navbar = () => {
           </Link>
         </Text>
 
-        {/* Search box or placeholder to preserve height */}
-        <Flex flex="1" justify="flex-end">
-          <InputGroup width="200px" mt="2" mb="1" visibility={showSearch ? "visible" : "hidden"}>
-            <Input
-              placeholder="Search..."
-              size="sm"
-              bg="gray.100"
-              color="black"
-              borderRadius="full"
-            />
-            <InputRightElement mt="-0.5" pointerEvents="none">
-              <FaSearch color="rgb(60, 50, 170)" />
-            </InputRightElement>
-          </InputGroup>
-        </Flex>
-
         {/* Action buttons */}
         <HStack spacing={2} mb="1" mt="1">
           <IconButton

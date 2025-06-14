@@ -10,34 +10,13 @@ const CustomerCategory = ({ topCategories, categoryTree }) => {
   const popoverBg = useColorModeValue("white", "gray.800");
   const popoverShadow = "md";
 
-  // Hàm tìm categoryId theo slug (từ categoryTree + topCategories)
-  const findCategoryIdBySlug = (slug) => {
-    // Tìm trong topCategories
-    const foundTop = topCategories.find(cat => cat.slug === slug);
-    if (foundTop) return foundTop._id;
-
-    // Tìm trong categoryTree (2 cấp)
-    for (const key in categoryTree) {
-      const level2List = categoryTree[key];
-      for (const level2 of level2List) {
-        if (level2.slug === slug) return level2._id;
-        if (level2.children) {
-          const foundLevel3 = level2.children.find(child => child.slug === slug);
-          if (foundLevel3) return foundLevel3._id;
-        }
-      }
-    }
-    return null;
-  };
-
-  const handleCategoryClick = (slug) => {
-    // Dùng slug làm URL, nhưng khi cần gọi API sẽ map sang id
-    navigate(`/customer/products/category/${slug}`);
+  const handleCategoryClick = (categoryId) => {
+    navigate(`/customer/products/category/${categoryId}`);
   };
 
   return (
     <HStack mt="1.5" mb="1.5" ml="-25" spacing={10} justify="center" flex="1" wrap="wrap">
-      {topCategories.map(({ name, _id, slug }) => (
+      {topCategories.map(({ name, _id }) => (
         <Popover trigger="hover" placement="bottom-start" key={_id} isLazy>
           <PopoverTrigger>
             <Text
@@ -45,7 +24,7 @@ const CustomerCategory = ({ topCategories, categoryTree }) => {
               fontWeight="bold"
               cursor="pointer"
               position="relative"
-              onClick={() => handleCategoryClick(slug)}
+              onClick={() => handleCategoryClick(_id)}
               _hover={{
                 _after: {
                   content: '""',
@@ -71,7 +50,7 @@ const CustomerCategory = ({ topCategories, categoryTree }) => {
                       fontWeight="bold"
                       fontSize="md"
                       cursor="pointer"
-                      onClick={() => handleCategoryClick(level2.slug)}
+                      onClick={() => handleCategoryClick(level2._id)}
                       _hover={{
                         color: menuTextColor,
                         textDecoration: "underline"
@@ -87,7 +66,7 @@ const CustomerCategory = ({ topCategories, categoryTree }) => {
                         fontSize="sm"
                         pl={4}
                         cursor="pointer"
-                        onClick={() => handleCategoryClick(level3.slug)}
+                        onClick={() => handleCategoryClick(level3._id)}
                         _hover={{
                           color: menuTextColor,
                           textDecoration: "underline"
@@ -95,7 +74,6 @@ const CustomerCategory = ({ topCategories, categoryTree }) => {
                       >
                         {level3.name}
                       </Text>
-
                     ))}
                   </Box>
                 ))}

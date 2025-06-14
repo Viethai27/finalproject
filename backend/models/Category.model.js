@@ -10,10 +10,6 @@ const categorySchema = new mongoose.Schema({
     ref: 'Category',
     default: null
   },
-  slug: {
-    type: String,
-    unique: true
-  }
 });
 
 const Category = mongoose.model('Category', categorySchema);
