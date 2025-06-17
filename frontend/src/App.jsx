@@ -8,11 +8,11 @@ import CustomerLayout from "./layouts/CustomerLayout";
 import Home from "./pages/customer/Home";
 import ProductDetail from "./pages/customer/ProductDetail";
 import CategoryPage from "./pages/customer/CategoryPage";
+import CustomerSearchResult from "./pages/customer/CustomerSearchResult";
 
 
 import AdminLayout from "./layouts/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
-import AddProduct from "./pages/admin/AddProduct" ;
 import CollectionManagementt from "./pages/admin/Collection";
 import ProductManagementPage from "./pages/admin/ProductManagement";
 import CategoryManage from "./pages/admin/CategoryManage";
@@ -26,7 +26,6 @@ function App() {
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<Dashboard />} />
                     <Route path="categories" element={<CategoryManage />} />
-                    <Route path="addproducts" element={<AddProduct />} />
                     <Route path="collections" element={<CollectionManagementt />} />
                     <Route path="productmanagement" element={<ProductManagementPage />} />
                 </Route>
@@ -35,6 +34,7 @@ function App() {
                     <Route path="home" element={<Home/>} />
                     <Route path="product-detail" element={<ProductDetail/>} />
                     <Route path="products/category/:id" element={<CategoryPage />} />
+                    <Route path="products/search" element={<CustomerSearchResult />} />
                </Route>
             </Routes>
 

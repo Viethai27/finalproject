@@ -8,8 +8,8 @@ import {
   getCategoryTreeByParent,
   getRootCategories,
   getFullCategoryTree,
-  getCategoryById
-
+  getCategoryById,
+  getSpecialCategories
 } from "../controllers/category.controller.js";
 
 const router = express.Router();
@@ -18,10 +18,8 @@ router.get("/by-parent", getCategoriesByParent);
 router.get("/tree-by-parent", getCategoryTreeByParent);
 router.get("/roots", getRootCategories);
 router.get("/tree", getFullCategoryTree);
+router.get("/special", getSpecialCategories);
 router.get("/:id", getCategoryById);
-
-
-
 
 router.get("/", getCategories);
 router.post("/", createCategory);

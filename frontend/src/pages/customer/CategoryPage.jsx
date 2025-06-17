@@ -1,38 +1,59 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { Spinner, Box, Text } from "@chakra-ui/react";
-import ProductByCategory from "../../components/customer/ProductListByCategory";
+import { Box, Text, Spinner } from "@chakra-ui/react";
+import ProductList from "../../components/shared/ProductList";
+import SortFilter from "../../components/customer/SortFilter";
 
 const CategoryPage = () => {
-  const { id } = useParams(); // Lấy id từ URL
-  const [categoryName, setCategoryName] = useState("");
+  const { id } = useParams();
+  const [categoryInfo, setCategoryInfo] = useState(null);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortOption, setSortOption] = useState(""); // Thêm state sortOption
 
   useEffect(() => {
-    const fetchCategory = async () => {
+    const fetchCategoryAndProducts = async () => {
       setLoading(true);
       try {
         const res = await axios.get(`http://localhost:5000/api/categories/${id}`);
-        setCategoryName(res.data.name);
+        const category = res.data.data;
+        setCategoryInfo(category);
+
+        let productRes;
+        if (category.isSpecial) {
+          // Special category:
+          let url = `http://localhost:5000/api/products/special/${category.specialType}?parentId=${category.parent}`;
+          if (sortOption) {
+            url += `&sort=${sortOption}`;
+          }
+          productRes = await axios.get(url);
+        } else {
+          // Normal category:
+          let url = `http://localhost:5000/api/products/by-category/${id}`;
+          if (sortOption) {
+            url += `?sort=${sortOption}`;
+          }
+          productRes = await axios.get(url);
+        }
+
+        setProducts(productRes.data.data);
       } catch (err) {
-        console.error("Error loading category by ID", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) fetchCategory();
-  }, [id]);
+    if (id) fetchCategoryAndProducts();
+  }, [id, sortOption]);  // khi sortOption đổi sẽ tự fetch lại
 
   if (loading) return <Spinner size="xl" mt={10} />;
 
   return (
     <Box p={6}>
-      <Text fontSize="2xl" fontWeight="bold" mb={4}>
-        {categoryName || "Category"}
-      </Text>
-      <ProductByCategory categoryId={id} />
+      <SortFilter sortOption={sortOption} setSortOption={setSortOption} />
+      <ProductList products={products} />
     </Box>
   );
 };

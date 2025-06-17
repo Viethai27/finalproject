@@ -1,9 +1,7 @@
-
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
-  Text,
   VStack,
   useDisclosure,
   useToast,
@@ -34,59 +32,17 @@ const CategoryManage = () => {
   const [categoryTree, setCategoryTree] = useState([]);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
-  const fetchParentOptions = async () => {
-    try {
-      const resRoot = await axios.get("http://localhost:5000/api/categories/roots");
-      const roots = resRoot.data.data;
-
-      const fullTree = await Promise.all(
-        roots.map(async (root) => {
-          const resL2 = await axios.get(
-            `http://localhost:5000/api/categories/tree-by-parent?parent=${root._id}`
-          );
-          return { ...root, children: resL2.data.data };
-        })
-      );
-
-      setParentOptions(fullTree);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const fetchCategoryTree = async () => {
     try {
-      const resRoot = await axios.get("http://localhost:5000/api/categories/roots");
-      const roots = resRoot.data.data;
-
-      const tree = await Promise.all(
-        roots.map(async (root) => {
-          const resL2 = await axios.get(
-            `http://localhost:5000/api/categories/tree-by-parent?parent=${root._id}`
-          );
-          const level2s = resL2.data.data;
-
-          const level2WithChildren = await Promise.all(
-            level2s.map(async (level2) => {
-              const resL3 = await axios.get(
-                `http://localhost:5000/api/categories/tree-by-parent?parent=${level2._id}`
-              );
-              return { ...level2, children: resL3.data.data };
-            })
-          );
-
-          return { ...root, children: level2WithChildren };
-        })
-      );
-
-      setCategoryTree(tree);
+      const res = await axios.get("http://localhost:5000/api/categories/tree");
+      setCategoryTree(res.data.data);
+      setParentOptions(res.data.data); // dùng luôn để chọn parent
     } catch (err) {
-      console.error(err);
+      console.error("Failed to fetch category tree", err);
     }
   };
 
   useEffect(() => {
-    fetchParentOptions();
     fetchCategoryTree();
   }, []);
 
@@ -105,7 +61,6 @@ const CategoryManage = () => {
       closeForm();
       setName("");
       setParent("");
-      fetchParentOptions();
       fetchCategoryTree();
     } catch {
       toast({ title: "Failed to create category", status: "error" });
@@ -118,7 +73,6 @@ const CategoryManage = () => {
       await axios.delete(`http://localhost:5000/api/categories/${categoryToDelete._id}`);
       toast({ title: `Deleted "${categoryToDelete.name}"`, status: "info" });
       setCategoryToDelete(null);
-      fetchParentOptions();
       fetchCategoryTree();
     } catch {
       toast({ title: "Failed to delete category", status: "error" });
@@ -128,7 +82,12 @@ const CategoryManage = () => {
   return (
     <>
       <Box mt={4} mr={6} display="flex" justifyContent="flex-end">
-        <Button onClick={openForm} bg="rgb(58, 44, 217)" color="white" _hover={{ bg: "rgb(138, 129, 234)" }}>
+        <Button
+          onClick={openForm}
+          bg="rgb(58, 44, 217)"
+          color="white"
+          _hover={{ bg: "rgb(138, 129, 234)" }}
+        >
           Add New Category
         </Button>
       </Box>

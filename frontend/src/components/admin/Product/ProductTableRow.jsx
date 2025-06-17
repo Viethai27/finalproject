@@ -9,7 +9,6 @@ const ProductTableRow = ({ product, onDelete }) => {
     <Tr>
       <Td>{product.name}</Td>
       <Td>${product.price.toFixed(2)}</Td>
-      <Td>{product.category?.name || "—"}</Td>
       <Td>{product.totalSold}</Td>
       <Td>{new Date(product.createdAt).toLocaleDateString()}</Td>
       <Td textAlign="center">

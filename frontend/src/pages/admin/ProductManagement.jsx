@@ -17,17 +17,16 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ProductTableRow from "../../components/admin/Product/ProductTableRow";
+import AddProductForm from "../../components/admin/Product/AddProductForm"; // THÊM
 
 const ProductManagementPage = () => {
-  const navigate = useNavigate();
   const toast = useToast();
-
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false); // THÊM
 
   const fetchProducts = async (search = "") => {
     try {
@@ -35,11 +34,7 @@ const ProductManagementPage = () => {
       const res = await axios.get("http://localhost:5000/api/products", {
         params: search ? { search } : {},
       });
-
-      const productsData =
-        Array.isArray(res.data?.data) ? res.data.data : [];
-
-      console.log("Fetched products:", productsData);
+      const productsData = Array.isArray(res.data?.data) ? res.data.data : [];
       setProducts(productsData);
     } catch (err) {
       console.error("Failed to load products", err);
@@ -95,11 +90,22 @@ const ProductManagementPage = () => {
         <Button
           colorScheme="blue"
           leftIcon={<AddIcon />}
-          onClick={() => navigate("/admin/addproducts")}
+          onClick={() => setShowForm(!showForm)}
         >
-          Add Product
+          {showForm ? "Close Form" : "Add Product"}
         </Button>
       </Flex>
+
+      {showForm && (
+        <Box mb={4}>
+          <AddProductForm
+            onSuccess={() => {
+              fetchProducts();
+              setShowForm(false);
+            }}
+          />
+        </Box>
+      )}
 
       <InputGroup mb={4}>
         <Input
@@ -123,7 +129,6 @@ const ProductManagementPage = () => {
             <Tr>
               <Th>Name</Th>
               <Th>Price</Th>
-              <Th>Category</Th>
               <Th>Total Sold</Th>
               <Th>Created At</Th>
               <Th textAlign="center">Actions</Th>
@@ -140,7 +145,7 @@ const ProductManagementPage = () => {
               ))
             ) : (
               <Tr>
-                <Td colSpan={6} textAlign="center">
+                <Td colSpan={5} textAlign="center">
                   No products found.
                 </Td>
               </Tr>

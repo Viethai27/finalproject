@@ -95,6 +95,11 @@ const AddProductForm = () => {
     setFormData({ ...formData, imageUrls: newImages });
   };
 
+  const formatDate = (date) => {
+    if (!date) return null;
+    return new Date(date).toISOString(); // chuẩn ISO cho backend
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -133,9 +138,13 @@ const AddProductForm = () => {
         ...formData,
         price: parseFloat(formData.price),
         imageUrls: formData.imageUrls.filter((url) => url.trim() !== ''),
+        featuredStart: formatDate(formData.featuredStart),
+        featuredEnd: formatDate(formData.featuredEnd),
       };
 
-      await axios.post('http://localhost:5000/api/products/full', payload);
+      console.log('Payload gửi về:', payload); // DEBUG
+
+      await axios.post('http://localhost:5000/api/products/create-full', payload);
 
       toast({
         title: 'Product created successfully',
@@ -218,9 +227,7 @@ const AddProductForm = () => {
               isMulti
               placeholder="Choose categories..."
               options={leafCategories}
-              value={leafCategories.filter((cat) =>
-                formData.categoryIds.includes(cat.value)
-              )}
+              value={leafCategories.filter((cat) => formData.categoryIds.includes(cat.value))}
               onChange={(selectedOptions) =>
                 setFormData({
                   ...formData,
@@ -272,26 +279,30 @@ const AddProductForm = () => {
             <>
               <FormControl isRequired>
                 <FormLabel>Featured Start Date</FormLabel>
-                <DatePicker
-                  selected={formData.featuredStart}
-                  onChange={(date) =>
-                    setFormData({ ...formData, featuredStart: date })
-                  }
-                  dateFormat="yyyy-MM-dd"
-                  className="chakra-input css-1c6x7wr"
-                />
+                <Box>
+                  <DatePicker
+                    selected={formData.featuredStart}
+                    onChange={(date) =>
+                      setFormData({ ...formData, featuredStart: date })
+                    }
+                    dateFormat="yyyy-MM-dd"
+                    customInput={<Input />}
+                  />
+                </Box>
               </FormControl>
 
               <FormControl isRequired>
                 <FormLabel>Featured End Date</FormLabel>
-                <DatePicker
-                  selected={formData.featuredEnd}
-                  onChange={(date) =>
-                    setFormData({ ...formData, featuredEnd: date })
-                  }
-                  dateFormat="yyyy-MM-dd"
-                  className="chakra-input css-1c6x7wr"
-                />
+                <Box>
+                  <DatePicker
+                    selected={formData.featuredEnd}
+                    onChange={(date) =>
+                      setFormData({ ...formData, featuredEnd: date })
+                    }
+                    dateFormat="yyyy-MM-dd"
+                    customInput={<Input />}
+                  />
+                </Box>
               </FormControl>
             </>
           )}
